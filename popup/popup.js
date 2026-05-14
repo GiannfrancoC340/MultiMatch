@@ -46,7 +46,6 @@ function renderGames() {
             <div class="game-status">${game.status}</div>
         </div>
         <span class="badge">${game.platform}</span>
-        <div class="toggle ${game.selected ? "on" : ""}"></div>
         `;
 
         card.addEventListener("click", () => {
