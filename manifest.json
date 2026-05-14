@@ -3,7 +3,7 @@
     "name": "MultiMatch",
     "version": "0.1.0",
     "description": "Watch multiple soccer games at the same time.",
-    "permissions": ["tabs", "windows", "storage"],
+    "permissions": ["tabs", "windows", "storage", "system.display"],
     "action": {
       "default_popup": "popup/popup.html",
       "default_icon": {
