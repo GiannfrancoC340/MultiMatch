@@ -5,8 +5,28 @@
     <link rel="stylesheet" href="popup.css" />
   </head>
   <body>
-    <h1>MultiMatch</h1>
-    <p>Coming soon...</p>
+    <div class="header">
+      <div>
+        <h1>MultiMatch</h1>
+        <p class="subtitle" id="live-count">Loading games...</p>
+      </div>
+      <span class="icon">⚽</span>
+    </div>
+
+    <p class="section-label">Select games to watch</p>
+    <div class="game-list" id="game-list">
+      <!-- Games injected by popup.js -->
+    </div>
+
+    <p class="section-label">Layout</p>
+    <div class="layout-btns">
+      <button class="layout-btn-active" data-layout="side-by-side">Side by side</button>
+      <button class="layout-btn" data-layout="2x2"> 2 x 2 grid</button>
+      <button class="layout-btn" data-layout="main-mini">Main + mini</button>
+    </div>
+
+    <button class="launch-btn" id="launch-btn">Launch MultiMatch</button>
+
     <script src="popup.js"></script>
   </body>
 </html>
