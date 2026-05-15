@@ -2,33 +2,184 @@ import { fetchAllMatches } from "../api/matches.js";
 
 let games = [];
 let selectedLayout = "side-by-side";
+let activeLeagues = new Set(["all"]);
+let activeDate = "all";
 
 async function init() {
   document.getElementById("live-count").textContent = "Loading games...";
   games = await fetchAllMatches();
 
-  if (games.length === 0) {
-    document.getElementById("live-count").textContent = "No games right now";
-  } else {
-    document.getElementById("live-count").textContent =
-      `${games.length} game${games.length !== 1 ? "s" : ""} available`;
+  document.getElementById("live-count").textContent =
+    games.length === 0
+      ? "No games available"
+      : `${games.length} game${games.length !== 1 ? "s" : ""} available`;
+
+  buildLeagueFilters();
+  renderGames();
+  initFilterPanel();
+  initLayoutButtons();
+  initLaunchButton();
+}
+
+function buildLeagueFilters() {
+  const leagues = [...new Set(games.map(g => g.league))].sort();
+  const container = document.getElementById("league-filters");
+
+  const allChip = document.createElement("button");
+  allChip.className = "chip active";
+  allChip.dataset.league = "all";
+  allChip.textContent = "All leagues";
+  container.appendChild(allChip);
+
+  leagues.forEach(league => {
+    const chip = document.createElement("button");
+    chip.className = "chip";
+    chip.dataset.league = league;
+    chip.textContent = league;
+    container.appendChild(chip);
+  });
+
+  container.addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+    const league = chip.dataset.league;
+
+    if (league === "all") {
+      activeLeagues = new Set(["all"]);
+      container.querySelectorAll(".chip").forEach(c => c.classList.remove("active"));
+      chip.classList.add("active");
+    } else {
+      activeLeagues.delete("all");
+      container.querySelector("[data-league='all']").classList.remove("active");
+
+      if (chip.classList.contains("active")) {
+        chip.classList.remove("active");
+        activeLeagues.delete(league);
+        if (activeLeagues.size === 0) {
+          activeLeagues.add("all");
+          container.querySelector("[data-league='all']").classList.add("active");
+        }
+      } else {
+        chip.classList.add("active");
+        activeLeagues.add(league);
+      }
+    }
+
+    updateFilterCount();
+    renderGames();
+  });
+}
+
+function initFilterPanel() {
+  const toggleBtn = document.getElementById("filter-toggle");
+  const panel = document.getElementById("filter-panel");
+
+  toggleBtn.addEventListener("click", () => {
+    const isOpen = !panel.classList.contains("hidden");
+    panel.classList.toggle("hidden", isOpen);
+    toggleBtn.classList.toggle("active", !isOpen);
+  });
+
+  document.getElementById("date-filters").addEventListener("click", e => {
+    const chip = e.target.closest(".chip");
+    if (!chip) return;
+
+    document.querySelectorAll("#date-filters .chip").forEach(c =>
+      c.classList.remove("active")
+    );
+    chip.classList.add("active");
+    activeDate = chip.dataset.date;
+
+    updateFilterCount();
+    renderGames();
+  });
+}
+
+function updateFilterCount() {
+  const count =
+    (activeLeagues.has("all") ? 0 : activeLeagues.size) +
+    (activeDate === "all" ? 0 : 1);
+
+  const badge = document.getElementById("filter-count");
+  badge.textContent = count;
+  badge.classList.toggle("hidden", count === 0);
+}
+
+function matchesDateFilter(game) {
+  if (activeDate === "all") return true;
+
+  const statusText = game.status.toLowerCase();
+  const now = new Date();
+
+  const today = new Date(now);
+  today.setHours(0, 0, 0, 0);
+
+  const tomorrow = new Date(today);
+  tomorrow.setDate(tomorrow.getDate() + 1);
+
+  const weekEnd = new Date(today);
+  weekEnd.setDate(weekEnd.getDate() + 7);
+
+  if (game.state === "in") {
+    return activeDate === "today";
   }
 
-  renderGames();
+  if (game.state === "post") {
+    return activeDate === "today";
+  }
+
+  const dateMatch = game.status.match(
+    /(\w+),\s(\w+)\s(\d+)\w*\sat\s([\d:]+)\s(AM|PM)\s(\w+)/
+  );
+
+  if (!dateMatch) return true;
+
+  const [, , month, day] = dateMatch;
+  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const monthIndex = months.findIndex(m => game.status.includes(m));
+  if (monthIndex === -1) return true;
+
+  const gameDate = new Date(now.getFullYear(), monthIndex, parseInt(day));
+  gameDate.setHours(0, 0, 0, 0);
+
+  if (activeDate === "today") return gameDate.getTime() === today.getTime();
+  if (activeDate === "tomorrow") return gameDate.getTime() === tomorrow.getTime();
+  if (activeDate === "week") return gameDate >= today && gameDate <= weekEnd;
+
+  return true;
+}
+
+function getFilteredGames() {
+  return games.filter(game => {
+    const leagueMatch = activeLeagues.has("all") || activeLeagues.has(game.league);
+    const dateMatch = matchesDateFilter(game);
+    return leagueMatch && dateMatch;
+  });
 }
 
 function renderGames() {
   const list = document.getElementById("game-list");
   list.innerHTML = "";
 
-  games.forEach(game => {
+  const filtered = getFilteredGames();
+
+  if (filtered.length === 0) {
+    list.innerHTML = `<div class="no-games">No games match your filters</div>`;
+    document.getElementById("launch-btn").disabled = true;
+    return;
+  }
+
+  filtered.forEach(game => {
     const card = document.createElement("div");
     card.className = `game-card ${game.selected ? "selected" : ""}`;
 
     card.innerHTML = `
       <div class="game-info">
         <div class="game-title">${game.away} vs ${game.home}</div>
-        <div class="game-status">${game.status}</div>
+        <div class="game-meta">
+          <span class="game-status">${game.status}</span>
+          <span class="game-league">· ${game.league}</span>
+        </div>
       </div>
       <span class="badge">${game.platform}</span>
     `;
@@ -59,16 +210,17 @@ function initLayoutButtons() {
   });
 }
 
-document.getElementById("launch-btn").addEventListener("click", () => {
-  const selected = games.filter(g => g.selected);
-  chrome.storage.local.set({ games: selected, layout: selectedLayout }, () => {
-    chrome.runtime.sendMessage({
-      action: "launchMultiMatch",
-      games: selected,
-      layout: selectedLayout
+function initLaunchButton() {
+  document.getElementById("launch-btn").addEventListener("click", () => {
+    const selected = games.filter(g => g.selected);
+    chrome.storage.local.set({ games: selected, layout: selectedLayout }, () => {
+      chrome.runtime.sendMessage({
+        action: "launchMultiMatch",
+        games: selected,
+        layout: selectedLayout
+      });
     });
   });
-});
+}
 
 init();
-initLayoutButtons();

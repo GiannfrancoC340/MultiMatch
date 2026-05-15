@@ -1,32 +1,49 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="stylesheet" href="popup.css" />
-  </head>
-  <body>
-    <div class="header">
-      <div>
-        <h1>MultiMatch</h1>
-        <p class="subtitle" id="live-count">Loading games...</p>
-      </div>
-      <img src="../icons/icon48.png" class="icon" alt="" />
+<head>
+  <meta charset="UTF-8" />
+  <link rel="stylesheet" href="popup.css" />
+</head>
+<body>
+  <div class="header">
+    <div>
+      <h1>MultiMatch</h1>
+      <p class="subtitle" id="live-count">Loading games...</p>
     </div>
+    <img src="../icons/icon48.png" class="icon" alt="" />
+  </div>
 
+  <div class="section-header">
     <p class="section-label">Select games to watch</p>
-    <div class="game-list" id="game-list">
-      <!-- Games injected by popup.js -->
+    <button class="filter-btn" id="filter-toggle">
+      <span>Filter</span>
+      <span id="filter-count" class="filter-count hidden">0</span>
+    </button>
+  </div>
+
+  <div class="filter-panel hidden" id="filter-panel">
+    <p class="filter-group-label">League</p>
+    <div class="filter-chips" id="league-filters"></div>
+    <p class="filter-group-label" style="margin-top: 10px;">Date</p>
+    <div class="filter-chips" id="date-filters">
+      <button class="chip active" data-date="all">All dates</button>
+      <button class="chip" data-date="today">Today</button>
+      <button class="chip" data-date="tomorrow">Tomorrow</button>
+      <button class="chip" data-date="week">This week</button>
     </div>
+  </div>
 
-    <p class="section-label">Layout</p>
-    <div class="layout-btns">
-      <button class="layout-btn active" data-layout="side-by-side">Side by side</button>
-      <button class="layout-btn" data-layout="2x2">2 x 2 grid</button>
-      <button class="layout-btn" data-layout="main-mini">Main + mini</button>
-    </div>
+  <div class="game-list" id="game-list"></div>
 
-    <button class="launch-btn" id="launch-btn">Launch MultiMatch</button>
+  <p class="section-label" style="margin-bottom: 8px;">Layout</p>
+  <div class="layout-btns">
+    <button class="layout-btn active" data-layout="side-by-side">Side by side</button>
+    <button class="layout-btn" data-layout="2x2">2 x 2 grid</button>
+    <button class="layout-btn" data-layout="main-mini">Main + mini</button>
+  </div>
 
-    <script type="module" src="popup.js"></script>
-  </body>
+  <button class="launch-btn" id="launch-btn">Launch MultiMatch</button>
+
+  <script type="module" src="popup.js"></script>
+</body>
 </html>

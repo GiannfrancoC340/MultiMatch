@@ -21,6 +21,25 @@ const LEAGUES = [
     const data = await res.json();
     return data.events || [];
   }
+
+  function getEnglishPlatform(competition) {
+    const geoBroadcasts = competition.geoBroadcasts || [];
+  
+    const englishBroadcast = geoBroadcasts.find(
+      b => b.lang === "en" && b.region === "us"
+    );
+  
+    if (englishBroadcast) {
+      return englishBroadcast.media?.shortName || null;
+    }
+  
+    const broadcasts = competition.broadcasts || [];
+    const englishFallback = broadcasts.find(
+      b => b.market === "national"
+    );
+  
+    return englishFallback?.names?.[0] || null;
+  }
   
   function parseMatch(event, leagueName) {
     const competition = event.competitions?.[0];
@@ -37,19 +56,24 @@ const LEAGUES = [
   
     const homeName = home.team.shortDisplayName;
     const awayName = away.team.shortDisplayName;
+    const homeScore = home.score || "0";
+    const awayScore = away.score || "0";
   
     let statusText = "";
     if (state === "in") {
-      statusText = `LIVE ${status.displayClock}`;
+      statusText = `LIVE ${status.displayClock} — ${awayScore} - ${homeScore}`;
     } else if (state === "pre") {
       statusText = status.type.detail;
     } else if (state === "post") {
-      statusText = "Full Time";
+      statusText = `Full Time — ${awayScore} - ${homeScore}`;
     }
   
-    const broadcasts = competition.broadcasts || [];
-    const platformName = broadcasts[0]?.names?.[0] || "Unknown";
-    const platformUrl = PLATFORM_URLS[platformName] || "#";
+    const platformName = getEnglishPlatform(competition);
+  
+    if (!platformName) return null;
+  
+    const platformUrl = PLATFORM_URLS[platformName];
+    if (!platformUrl) return null;
   
     return {
       id: event.id,

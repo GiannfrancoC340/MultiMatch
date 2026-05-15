@@ -5,20 +5,21 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 });
 
 async function launchGames(games, layout) {
-    const screen = await getScreenInfo();
-    const positions = calculatePositions(games.length, layout, screen);
-  
-    for (let i = 0; i < games.length; i++) {
-      const pos = positions[i];
-      chrome.windows.create({
-        url: games[i].url,
-        type: "popup",
-        left: pos.left,
-        top: pos.top,
-        width: pos.width,
-        height: pos.height
-      });
-    }
+  const screen = await getScreenInfo();
+  const validGames = games.filter(g => g.url && g.url.startsWith("https://"));
+  const positions = calculatePositions(validGames.length, layout, screen);
+
+  for (let i = 0; i < validGames.length; i++) {
+    const pos = positions[i];
+    chrome.windows.create({
+      url: validGames[i].url,
+      type: "popup",
+      left: pos.left,
+      top: pos.top,
+      width: pos.width,
+      height: pos.height
+    });
+  }
 }
 
 function getScreenInfo() {
