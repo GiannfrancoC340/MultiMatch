@@ -198,16 +198,25 @@
     align-items: center;
     gap: 6px;
     margin-top: 2px;
+    flex-wrap: nowrap;
+    min-width: 0;
   }
   
   .game-status {
     font-size: 11px;
     color: #888;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    min-width: 0;
+    flex-shrink: 1;
   }
   
   .game-league {
     font-size: 10px;
     color: #bbb;
+    white-space: nowrap;
+    flex-shrink: 0;
   }
   
   .badge {
