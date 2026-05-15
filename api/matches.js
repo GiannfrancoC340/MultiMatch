@@ -68,7 +68,12 @@ export const LEAGUES = [
   
     let statusText = "";
     if (state === "in") {
-      statusText = `LIVE ${status.displayClock} — ${awayScore} - ${homeScore}`;
+      const isHalftime = status.type?.name === "STATUS_HALFTIME";
+      if (isHalftime) {
+        statusText = `Halftime — ${awayScore} - ${homeScore}`;
+      } else {
+        statusText = `LIVE ${status.displayClock} — ${awayScore} - ${homeScore}`;
+      }
     } else if (state === "pre") {
       statusText = status.type.detail;
     } else if (state === "post") {
