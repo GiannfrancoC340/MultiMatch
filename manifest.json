@@ -4,6 +4,10 @@
     "version": "0.1.0",
     "description": "Watch multiple soccer games at the same time.",
     "permissions": ["tabs", "windows", "storage", "system.display"],
+    "host_permissions": [
+      "https://site.api.espn.com/*",
+      "https://www.fotmob.com/*"
+    ],
     "action": {
       "default_popup": "popup/popup.html",
       "default_icon": {
@@ -18,10 +22,12 @@
     "content_scripts": [
       {
         "matches": [
-          "*://*.peacocktv.com/*",
-          "*://*.paramountplus.com/*",
-          "*://*.espnplus.com/*"
-        ],
+        "*://*.peacocktv.com/*",
+        "*://*.paramountplus.com/*",
+        "*://*.espnplus.com/*",
+        "*://*.fubo.tv/*",
+        "*://*.tv.apple.com/*"
+      ],
         "js": ["content.js"]
       }
     ]
