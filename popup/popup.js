@@ -175,6 +175,11 @@ function renderGames() {
 
   const filtered = getFilteredGames();
 
+  document.getElementById("live-count").textContent =
+    filtered.length === 0
+      ? "No games available"
+      : `${filtered.length} game${filtered.length !== 1 ? "s" : ""} available`;
+
   if (filtered.length === 0) {
     list.innerHTML = `<div class="no-games">No games match your filters</div>`;
     document.getElementById("launch-btn").disabled = true;
