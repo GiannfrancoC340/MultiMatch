@@ -1,9 +1,10 @@
-import { fetchAllMatches } from "../api/matches.js";
+import { fetchAllMatches, LEAGUES } from "../api/matches.js";
 
 let games = [];
 let selectedLayout = "side-by-side";
 let activeLeagues = new Set(["all"]);
 let activeDate = "all";
+let activeStatus = "all";
 
 async function init() {
   document.getElementById("live-count").textContent = "Loading games...";
@@ -19,10 +20,26 @@ async function init() {
   initFilterPanel();
   initLayoutButtons();
   initLaunchButton();
+
+  setInterval(async () => {
+    const previousSelections = new Set(
+      games.filter(g => g.selected).map(g => g.id)
+    );
+  
+    games = await fetchAllMatches();
+  
+    games.forEach(g => {
+      if (previousSelections.has(g.id)) g.selected = true;
+    });
+  
+    document.getElementById("live-count").textContent =
+      `${games.length} game${games.length !== 1 ? "s" : ""} available`;
+  
+    renderGames();
+  }, 60000);
 }
 
 function buildLeagueFilters() {
-  const leagues = [...new Set(games.map(g => g.league))].sort();
   const container = document.getElementById("league-filters");
 
   const allChip = document.createElement("button");
@@ -31,11 +48,11 @@ function buildLeagueFilters() {
   allChip.textContent = "All leagues";
   container.appendChild(allChip);
 
-  leagues.forEach(league => {
+  LEAGUES.forEach(({ name }) => {
     const chip = document.createElement("button");
     chip.className = "chip";
-    chip.dataset.league = league;
-    chip.textContent = league;
+    chip.dataset.league = name;
+    chip.textContent = name;
     container.appendChild(chip);
   });
 
@@ -95,10 +112,25 @@ function initFilterPanel() {
   });
 }
 
+document.getElementById("status-filters").addEventListener("click", e => {
+  const chip = e.target.closest(".chip");
+  if (!chip) return;
+
+  document.querySelectorAll("#status-filters .chip").forEach(c =>
+    c.classList.remove("active")
+  );
+  chip.classList.add("active");
+  activeStatus = chip.dataset.status;
+
+  updateFilterCount();
+  renderGames();
+});
+
 function updateFilterCount() {
   const count =
     (activeLeagues.has("all") ? 0 : activeLeagues.size) +
-    (activeDate === "all" ? 0 : 1);
+    (activeDate === "all" ? 0 : 1) +
+    (activeStatus === "all" ? 0 : 1);
 
   const badge = document.getElementById("filter-count");
   badge.textContent = count;
@@ -107,11 +139,9 @@ function updateFilterCount() {
 
 function matchesDateFilter(game) {
   if (activeDate === "all") return true;
+  if (!game.date) return true;
 
-  const statusText = game.status.toLowerCase();
-  const now = new Date();
-
-  const today = new Date(now);
+  const today = new Date();
   today.setHours(0, 0, 0, 0);
 
   const tomorrow = new Date(today);
@@ -120,26 +150,7 @@ function matchesDateFilter(game) {
   const weekEnd = new Date(today);
   weekEnd.setDate(weekEnd.getDate() + 7);
 
-  if (game.state === "in") {
-    return activeDate === "today";
-  }
-
-  if (game.state === "post") {
-    return activeDate === "today";
-  }
-
-  const dateMatch = game.status.match(
-    /(\w+),\s(\w+)\s(\d+)\w*\sat\s([\d:]+)\s(AM|PM)\s(\w+)/
-  );
-
-  if (!dateMatch) return true;
-
-  const [, , month, day] = dateMatch;
-  const months = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
-  const monthIndex = months.findIndex(m => game.status.includes(m));
-  if (monthIndex === -1) return true;
-
-  const gameDate = new Date(now.getFullYear(), monthIndex, parseInt(day));
+  const gameDate = new Date(game.date);
   gameDate.setHours(0, 0, 0, 0);
 
   if (activeDate === "today") return gameDate.getTime() === today.getTime();
@@ -153,7 +164,8 @@ function getFilteredGames() {
   return games.filter(game => {
     const leagueMatch = activeLeagues.has("all") || activeLeagues.has(game.league);
     const dateMatch = matchesDateFilter(game);
-    return leagueMatch && dateMatch;
+    const statusMatch = activeStatus === "all" || game.state === activeStatus;
+    return leagueMatch && dateMatch && statusMatch;
   });
 }
 

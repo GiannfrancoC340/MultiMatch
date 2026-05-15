@@ -1,18 +1,25 @@
-const LEAGUES = [
-    { id: "eng.1", name: "Premier League" },
-    { id: "esp.1", name: "La Liga" },
-    { id: "ita.1", name: "Serie A" },
-    { id: "ger.1", name: "Bundesliga" },
-    { id: "fra.1", name: "Ligue 1" },
-    { id: "usa.1", name: "MLS" }
+export const LEAGUES = [
+    { id: "eng.1",          name: "Premier League" },
+    { id: "esp.1",          name: "La Liga" },
+    { id: "ita.1",          name: "Serie A" },
+    { id: "ger.1",          name: "Bundesliga" },
+    { id: "fra.1",          name: "Ligue 1" },
+    { id: "usa.1",          name: "MLS" },
+    { id: "uefa.champions", name: "UCL" },
+    { id: "uefa.europa",    name: "UEL" },
+    { id: "uefa.europa.conf", name: "UECL" }
   ];
   
   const PLATFORM_URLS = {
-    "Peacock":    "https://www.peacocktv.com",
-    "ESPN+":      "https://www.espnplus.com",
-    "Paramount+": "https://www.paramountplus.com",
-    "fuboTV":     "https://www.fubo.tv",
-    "Apple TV+":  "https://tv.apple.com"
+    "Peacock":            "https://www.peacocktv.com",
+    "ESPN+":              "https://www.espnplus.com",
+    "Paramount+":         "https://www.paramountplus.com",
+    "fuboTV":             "https://www.fubo.tv",
+    "Apple TV+":          "https://tv.apple.com",
+    "CBS":                "https://www.cbssports.com",
+    "CBS Sports Network": "https://www.cbssports.com",
+    "TNT":                "https://www.tntdrama.com",
+    "Max":                "https://www.max.com"
   };
   
   async function fetchLeagueMatches(leagueId) {
@@ -81,6 +88,7 @@ const LEAGUES = [
       away: awayName,
       status: statusText,
       state,
+      date: event.date,
       league: leagueName,
       platform: platformName,
       url: platformUrl,
