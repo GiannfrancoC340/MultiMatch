@@ -19,7 +19,9 @@ export const LEAGUES = [
     "CBS":                "https://www.cbssports.com",
     "CBS Sports Network": "https://www.cbssports.com",
     "TNT":                "https://www.tntdrama.com",
-    "Max":                "https://www.max.com"
+    "Max":                "https://www.max.com",
+    "NBC":                "https://www.nbc.com/live",
+    "USA Network":        "https://www.usanetwork.com/live"
   };
   
   async function fetchLeagueMatches(leagueId) {
