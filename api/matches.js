@@ -72,14 +72,14 @@ export const LEAGUES = [
     if (state === "in") {
       const isHalftime = status.type?.name === "STATUS_HALFTIME";
       if (isHalftime) {
-        statusText = `Halftime — ${awayScore} - ${homeScore}`;
+        statusText = `Halftime — ${homeScore} - ${awayScore}`;
       } else {
-        statusText = `LIVE ${status.displayClock} — ${awayScore} - ${homeScore}`;
+        statusText = `LIVE ${status.displayClock} — ${homeScore} - ${awayScore}`;
       }
     } else if (state === "pre") {
       statusText = status.type.detail;
     } else if (state === "post") {
-      statusText = `Full Time — ${awayScore} - ${homeScore}`;
+      statusText = `Full Time — ${homeScore} - ${awayScore}`;
     }
   
     const platformName = getEnglishPlatform(competition);

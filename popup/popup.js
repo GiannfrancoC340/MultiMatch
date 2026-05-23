@@ -192,7 +192,7 @@ function renderGames() {
 
     card.innerHTML = `
       <div class="game-info">
-        <div class="game-title">${game.away} vs ${game.home}</div>
+        <div class="game-title">${game.home} vs ${game.away}</div>
         <div class="game-meta">
           <span class="game-status">${game.status}</span>
           <span class="game-league">· ${game.league}</span>
