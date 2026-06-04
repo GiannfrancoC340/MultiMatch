@@ -43,9 +43,25 @@ Keeping up with multiple matches across different streaming platforms usually me
 
 ---
 
-## Screenshots
+## Media
 
-> [Add screenshots or a demo GIF here]
+### Screenshots
+
+**First Picture**
+> <img width="387" height="433" alt="Screenshot 2026-05-14 at 12 58 48 PM" src="https://github.com/user-attachments/assets/ba22c02f-0d08-4329-a5ee-331423a2c818" />
+
+**More games uploaded**
+> <img width="375" height="675" alt="Screenshot 2026-05-14 at 8 18 43 PM" src="https://github.com/user-attachments/assets/99e9c49e-a86d-48f9-8fb6-a420e94b20db" />
+
+**ESPN API added**
+> <img width="363" height="547" alt="Screenshot 2026-05-14 at 8 36 29 PM" src="https://github.com/user-attachments/assets/7d239fd3-df72-4947-b220-2b589ff43684" />
+
+**Live game tracking**
+> <img width="346" height="532" alt="Screenshot 2026-05-15 at 3 07 25 PM" src="https://github.com/user-attachments/assets/5c4942a8-b412-4022-8f20-7113d6f587a8" />
+
+### Videos
+
+> [upload videos here]
 
 ---
 
